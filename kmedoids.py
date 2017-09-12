@@ -1,16 +1,55 @@
 import numpy as np
 import random
 
-def kMedoids(D, k, tmax=100):
+def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
     # determine dimensions of distance matrix D
     m, n = D.shape
+    # Assert square distance matrix
+    assert n == m
 
     if k > n:
         raise Exception('too many medoids')
     # randomly initialize an array of k medoid indices
-    M = np.arange(n)
-    np.random.shuffle(M)
-    M = np.sort(M[:k])
+    if str(init_Ms) == "random":
+        M = np.arange(n)
+        np.random.shuffle(M)
+        M = np.sort(M[:k])
+    if str(init_Ms) == "isolated":
+        if n_iso is None:
+            n_iso = k
+        elif n_iso > k:
+            n_iso = k
+        else:
+            assert type(n_iso) == int
+        summed_distances = np.sum(D, axis = 0)
+        M = np.empty(0, dtype=int)
+        # Find most isolated sample to use as first medoid
+        i = np.argmax(summed_distances)
+        M = np.append(M, i)
+        # Find new medoids which are furthest away from previous medoids
+        for i in range(1, n_iso):
+            summed_distances = np.zeros(n)
+            for j in range(0, len(M)):
+                summed_distances += D[:, M[j]]
+            j = np.argmax(summed_distances)
+            M = np.append(M, j)
+        # Randomize the rest
+        for i in range(n_iso, k):
+            rand = np.random.random_integers(0,n-1)
+            while rand in M:
+                rand = np.random.random_integers(0,n-1)
+            M = np.append(M, rand)
+    elif len(init_Ms) == k:
+        M = init_Ms
+    elif len(init_Ms) < k:
+        M = init_Ms
+        for i in range(len(init_Ms), k):
+            rand = np.random.random_integers(0,n-1)
+            while rand in M:
+                rand = np.random.random_integers(0,n-1)
+            M = np.append(M, rand)
+    else:
+        raise Exception("intial medoids vector has the wrong length")
 
     # create a copy of the array of medoid indices
     Mnew = np.copy(M)
