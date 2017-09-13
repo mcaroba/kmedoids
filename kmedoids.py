@@ -22,6 +22,7 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
         else:
             assert type(n_iso) == int
         summed_distances = np.sum(D, axis = 0)
+        av_distance = np.sum(D) / float(n)**2
         M = np.empty(0, dtype=int)
         # Find most isolated sample to use as first medoid
         i = np.argmax(summed_distances)
@@ -36,7 +37,11 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
         # Randomize the rest
         for i in range(n_iso, k):
             rand = np.random.random_integers(0,n-1)
-            while rand in M:
+            # Make sure that the random medoid is not already chosen and
+            # is not too close to another medoid by imposing the inter-
+            # medoid distance to be larger than the average inter-sample
+            # distance
+            while rand in M or any(D[rand,j] < av_distance for j in M):
                 rand = np.random.random_integers(0,n-1)
             M = np.append(M, rand)
     elif len(init_Ms) == k:
