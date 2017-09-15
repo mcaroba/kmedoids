@@ -41,8 +41,13 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
             # is not too close to another medoid by imposing the inter-
             # medoid distance to be larger than the average inter-sample
             # distance
+            tries = 0
             while rand in M or any(D[rand,j] < av_distance for j in M):
+                tries += 1
                 rand = np.random.random_integers(0,n-1)
+                if tries == 100:
+                    tries = 0
+                    av_distance *= 0.9
             M = np.append(M, rand)
     elif len(init_Ms) == k:
         M = init_Ms
