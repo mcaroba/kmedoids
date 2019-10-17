@@ -14,7 +14,7 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
         M = np.arange(n)
         np.random.shuffle(M)
         M = np.sort(M[:k])
-    if str(init_Ms) == "isolated":
+    elif str(init_Ms) == "isolated":
         if n_iso is None:
             n_iso = k
         elif n_iso > k:
