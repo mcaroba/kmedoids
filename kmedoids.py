@@ -21,6 +21,9 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
             n_iso = k
         else:
             assert type(n_iso) == int
+            if n_iso == 0:
+                raise Exception('You must choose a non-zero number of \
+                                 isolated medoids or switch to random init.')
         summed_distances = np.sum(D, axis = 0)
         av_distance = np.sum(D) / float(n)**2
         M = np.empty(0, dtype=int)
@@ -32,6 +35,8 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
             summed_distances = np.zeros(n)
             for j in range(0, len(M)):
                 summed_distances += D[:, M[j]]
+            # avoid repeating medoids
+            summed_distances[M] = 0 
             j = np.argmax(summed_distances)
             M = np.append(M, j)
         # Randomize the rest
@@ -66,7 +71,7 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
 
     # initialize a dictionary to represent clusters
     C = {}
-    for t in xrange(tmax):
+    for t in range(tmax):
         # determine clusters, i. e. arrays of data indices
         J = np.argmin(D[:,M], axis=1)
         for kappa in range(k):
