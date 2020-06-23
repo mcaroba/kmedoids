@@ -74,6 +74,7 @@ def kMedoids(D, k, tmax=100, init_Ms="random", n_iso=None):
     for t in range(tmax):
         # determine clusters, i. e. arrays of data indices
         J = np.argmin(D[:,M], axis=1)
+        J[M] = np.arange(0, k, 1)
         for kappa in range(k):
             C[kappa] = np.where(J==kappa)[0]
         # update cluster medoids
